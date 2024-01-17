@@ -61,10 +61,10 @@ def nice_string_output(d, extra_spacing=5, decimals=3):
     return string[:-2]
 
 
-def add_text_to_ax(x_coord, y_coord, string, ax, fontsize=12, color='k'):
+def add_text_to_ax(x_coord, y_coord, string, ax, fontsize=12, color='k', *args, **kwargs):
     """ Shortcut to add text to an ax with proper font. Relative coords."""
     ax.text(x_coord, y_coord, string, family='monospace', fontsize=fontsize,
-            transform=ax.transAxes, verticalalignment='top', color=color)
+            transform=ax.transAxes, verticalalignment='top', color=color, *args, **kwargs)
     return None
 
 
@@ -92,9 +92,7 @@ def compute_f(f, x, *par):
 
 
 class Chi2Regression:  # override the class with a better one
-        
-    def __init__(self, f, x, y, sy=None, weights=None, bound=None):
-        
+    def __init__(self, f, x, y, sy=None, weights=None, bound=None, zero=False):
         if bound is not None:
             x = np.array(x)
             y = np.array(y)
@@ -103,10 +101,15 @@ class Chi2Regression:  # override the class with a better one
             x  = x[mask]
             y  = y[mask]
             sy = sy[mask]
-
+        if zero:   
+            mask = y > 0
+            x  = x[mask]
+            y  = y[mask]
+            sy = sy[mask]
         self.f = f  # model predicts y for given x
         self.x = np.array(x)
         self.y = np.array(y)
+        
         
         self.sy = set_var_if_None(sy, self.x)
         self.weights = set_var_if_None(weights, self.x)
